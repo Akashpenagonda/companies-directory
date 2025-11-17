@@ -83,7 +83,7 @@ export default function Home() {
   return (
     <>
       {/* =============================================================== */}
-      {/* ⭐ HERO SECTION — FULL WIDTH — NO GAP IN MOBILE */}
+      {/* ⭐ HERO SECTION  */}
       {/* =============================================================== */}
       <section id="home" className="w-full pt-28 pb-24 text-center relative overflow-hidden">
 

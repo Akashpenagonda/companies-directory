@@ -13,12 +13,28 @@
 
 ---
 
+🚀 Live Demo
+
+🔗 Netlify: https://frontlinesedu.netlify.app/
+
 # 🌟 **Project Overview**
 
-The **Companies Directory** is a highly interactive and visually rich frontend application built using **React + Tailwind + Framer Motion**.  
-Designed with futuristic gradients, 3D hover animations, and neon glow effects — this app transforms boring company data into a beautiful and intuitive directory.
+Companies Directory is a fast, modern, and fully responsive React.js web application designed as part of a Frontend Developer Assignment for Frontlines Media.
+It demonstrates real-world skills in:
 
-This project is part of the **Frontend Developer Assignment** for **Frontlines Media**.
+Modern UI/UX
+
+API integration
+
+Search + filtering
+
+Sorting + pagination
+
+Optimized performance
+
+Clean architecture and reusability
+
+The project includes a local json-server backend for development and a static JSON fallback for production environments such as Netlify, ensuring seamless functionality everywhere.
 
 ---
 
@@ -63,71 +79,67 @@ This project is part of the **Frontend Developer Assignment** for **Frontlines M
 
 ---
 
-# 📡 API & Mock Server
-
-This project uses **JSON Server** as a mock backend.
-
-Start the server:
-```bash
-
-npm run start:mock
-
-API Base URL:
-
-http://localhost:4000/companies
-
-Supports:
-
-?_page & _limit
-?q=
-?location=
-?industry=
-?_sort=name&_order=asc
-
 Tech Stack :
 
-| Layer        | Technology    |
-| ------------ | ------------- |
-| Frontend     | React (Hooks) |
-| Styling      | TailwindCSS   |
-| Animations   | Framer Motion |
-| Icons        | Heroicons     |
-| API Client   | Axios         |
-| Mock Backend | JSON Server   |
-| Build Tool   | Vite          |
+| Technology          | Purpose                       |
+| ------------------- | ----------------------------- |
+| **React.js (Vite)** | Fast, modular UI              |
+| **Tailwind CSS**    | Utility-first, modern styling |
+| **Framer Motion**   | Animations & transitions      |
+| **json-server**     | Local REST API                |
+| **Axios**           | API communication             |
+| **Netlify**         | Production hosting            |
+| **JavaScript ES6+** | Core logic                    |
+
 
 
 📂 File Structure :
 
-src/
- ├── components/
- │   ├── CompanyCard.jsx
- │   ├── Filters.jsx
- │   ├── Footer.jsx
- │   ├── Navbar.jsx
- │   ├── Pagination.jsx
- ├── pages/
- │   ├── Home.jsx
- ├── services/
- │   ├── api.js
- ├── utils/
- │   ├── useDebounce.js
- ├── App.jsx
- ├── index.css
- ├── main.jsx
+📦 companies-directory
+│
+├── public/
+│   ├── companies.json         # Production data source
+│
+├── src/
+│   ├── components/
+│   │   ├── Filters.jsx        # Search, filter, sort controls
+│   │   ├── CompanyCard.jsx    # 3D card with hover tilt
+│   │   ├── Navbar.jsx
+│   │   ├── Footer.jsx
+│   │   └── Pagination.jsx
+│   │
+│   ├── pages/
+│   │   └── Home.jsx           # Main view containing hero & grid
+│   │
+│   ├── services/
+│   │   └── api.js             # Smart local/prod API handler
+│   │
+│   ├── utils/
+│   │   └── useDebounce.js
+│   │
+│   ├── App.jsx
+│   └── main.jsx
+│
+├── db.json                    # Local dev database (json-server)
+├── package.json
+├── tailwind.config.js
+└── README.md
 
 ▶️ Run Locally
 1️⃣ Install dependencies :
 
 npm install
 
-2️⃣ Start frontend :
+
+2️⃣ Start JSON Server :
+
+ json-server --watch db.json --port 4000
+
+3️⃣ Start frontend :
 
 npm run dev
  
- 3️⃣ Start API server :
 
- npm run start:mock
 
 
 🧑‍💻 Developed By
