@@ -12,20 +12,18 @@ export default function Filters({
   onResetFilters
 }) {
   const locations = useMemo(() => {
-    const set = new Set(allCompanies.map((c) => c.location));
-    return Array.from(set);
+    return [...new Set(allCompanies.map((c) => c.location.trim()))];
   }, [allCompanies]);
 
   const industries = useMemo(() => {
-    const set = new Set(allCompanies.map((c) => c.industry));
-    return Array.from(set);
+    return [...new Set(allCompanies.map((c) => c.industry.trim()))];
   }, [allCompanies]);
 
+  // FIXED
   const filtersActive =
-    searchTerm !== "" ||
+    searchTerm.trim() !== "" ||
     locationFilter !== null ||
-    industryFilter !== null ||
-    setSortBy !== null;
+    industryFilter !== null;
 
   return (
     <div className="bg-white dark:bg-gray-900/60 backdrop-blur-md p-5 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center">
@@ -43,7 +41,10 @@ export default function Filters({
       {/* Location Filter */}
       <select
         value={locationFilter || ""}
-        onChange={(e) => setLocationFilter(e.target.value || null)}
+        onChange={(e) => {
+          const v = e.target.value.trim();
+          setLocationFilter(v === "" ? null : v);
+        }}
         className="p-2 border rounded-md bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
       >
         <option value="">All Locations</option>
@@ -57,7 +58,10 @@ export default function Filters({
       {/* Industry Filter */}
       <select
         value={industryFilter || ""}
-        onChange={(e) => setIndustryFilter(e.target.value || null)}
+        onChange={(e) => {
+          const v = e.target.value.trim();
+          setIndustryFilter(v === "" ? null : v);
+        }}
         className="p-2 border rounded-md bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
       >
         <option value="">All Industries</option>
@@ -84,7 +88,7 @@ export default function Filters({
         <option value="name_desc">Name (Z → A)</option>
       </select>
 
-      {/* RESET BUTTON */}
+      {/* Reset Button */}
       {filtersActive && (
         <button
           onClick={onResetFilters}

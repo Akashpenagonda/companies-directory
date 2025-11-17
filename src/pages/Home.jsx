@@ -9,6 +9,11 @@ import CompanyCard from "../components/CompanyCard";
 import Pagination from "../components/Pagination";
 import useDebounce from "../utils/useDebounce";
 
+// detect environment (local or netlify)
+const IS_LOCAL =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
 export default function Home() {
   const [companies, setCompanies] = useState([]);
   const [allList, setAllList] = useState([]);
@@ -24,15 +29,23 @@ export default function Home() {
   const [industryFilter, setIndustryFilter] = useState(null);
   const [sortParams, setSortParams] = useState(null);
 
-  // Fetch all companies once
+  // -------------------------------------------------------------------
+  // ⭐ FIXED: Fetch full company list using local OR production URL
+  // -------------------------------------------------------------------
   useEffect(() => {
+    const url = IS_LOCAL
+      ? "http://localhost:4000/companies"
+      : "/companies.json";
+
     axios
-      .get("http://localhost:4000/companies")
+      .get(url)
       .then((res) => setAllList(res.data || []))
       .catch(() => setAllList([]));
   }, []);
 
-  // Main API call
+  // -------------------------------------------------------------------
+  // ⭐ Main paginated + filtered API call (local via api.js / production using static)
+  // -------------------------------------------------------------------
   useEffect(() => {
     setLoading(true);
 
@@ -56,7 +69,9 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, [page, q, locationFilter, industryFilter, sortParams]);
 
-  // RESET
+  // -------------------------------------------------------------------
+  // ⭐ Reset filters
+  // -------------------------------------------------------------------
   const resetFilters = () => {
     setSearch("");
     setLocationFilter(null);
@@ -67,17 +82,17 @@ export default function Home() {
 
   return (
     <>
-      {/* ================================================================================= */}
-      {/* ⭐ FULL-WIDTH HERO (FIXED CLEAN VERSION) */}
-      {/* ================================================================================= */}
+      {/* =============================================================== */}
+      {/* ⭐ HERO SECTION — FULL WIDTH — NO GAP IN MOBILE */}
+      {/* =============================================================== */}
       <section id="home" className="w-full pt-28 pb-24 text-center relative overflow-hidden">
 
-        {/* Neon background */}
+        {/* Glow background */}
         <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[650px] h-[650px]
           bg-gradient-to-r from-indigo-600 to-purple-600 opacity-20 blur-[160px] rounded-full">
         </div>
 
-        {/* Center container ONLY for hero text */}
+        {/* hero content centered */}
         <div className="max-w-3xl mx-auto px-4">
           <motion.h1
             initial={{ y: 30, opacity: 0 }}
@@ -100,7 +115,12 @@ export default function Home() {
             Browse, filter and explore verified companies with a futuristic interface.
           </motion.p>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="mt-8">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mt-8"
+          >
             <a
               href="#companies"
               className="relative px-8 py-3 rounded-full text-white font-medium 
@@ -114,9 +134,9 @@ export default function Home() {
 
       </section>
 
-      {/* ================================================================================= */}
-      {/* ⭐ MAIN CONTENT (INSIDE MAX WIDTH) */}
-      {/* ================================================================================= */}
+      {/* =============================================================== */}
+      {/* ⭐ MAIN CONTENT (FILTERS + CARDS) */}
+      {/* =============================================================== */}
       <div className="max-w-6xl mx-auto px-6">
 
         {/* Filters */}
@@ -145,7 +165,10 @@ export default function Home() {
         />
 
         {/* Companies Grid */}
-        <section id="companies" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+        <section
+          id="companies"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10"
+        >
           {loading ? (
             Array.from({ length: limit }).map((_, i) => (
               <div key={i} className="h-40 bg-gray-200 dark:bg-gray-800 animate-pulse rounded-xl" />

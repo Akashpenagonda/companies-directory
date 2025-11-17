@@ -7,7 +7,7 @@ const IS_LOCAL =
 // Local json-server
 const LOCAL_BASE = "http://localhost:4000";
 
-// Production (Netlify): load static JSON file
+// Production (Netlify): static JSON file
 const PROD_JSON = "/companies.json";
 
 export async function getCompanies({
@@ -19,8 +19,9 @@ export async function getCompanies({
   sortBy,
   order
 } = {}) {
+
   // ---------------------------------------------------------
-  // ✔ LOCAL MODE → Use json-server
+  // ✔ LOCAL MODE → json-server
   // ---------------------------------------------------------
   if (IS_LOCAL) {
     const params = {
@@ -37,23 +38,22 @@ export async function getCompanies({
     }
 
     const res = await axios.get(`${LOCAL_BASE}/companies`, { params });
-
     const total = parseInt(res.headers["x-total-count"] || res.data.length);
 
     return { data: res.data, total };
   }
 
   // ---------------------------------------------------------
-  // ✔ PRODUCTION (Netlify) → Use /companies.json
+  // ✔ PRODUCTION (Netlify) → static JSON file
   // ---------------------------------------------------------
   const res = await axios.get(PROD_JSON);
 
-  // IMPORTANT: res.data IS ALREADY AN ARRAY
+  // IMPORTANT: res.data MUST be an array
   let data = Array.isArray(res.data) ? [...res.data] : [];
 
-  // 🔍 Search
+  // 🔍 SEARCH
   if (q) {
-    const text = q.toLowerCase();
+    const text = q.trim().toLowerCase();
     data = data.filter(
       (c) =>
         c.name.toLowerCase().includes(text) ||
@@ -62,13 +62,23 @@ export async function getCompanies({
     );
   }
 
-  // 📍 Filter by location
-  if (location) data = data.filter((c) => c.location === location);
+  // 📍 FILTER BY LOCATION (FIXED: trim + lowercase)
+  if (location) {
+    const loc = location.trim().toLowerCase();
+    data = data.filter(
+      (c) => c.location.trim().toLowerCase() === loc
+    );
+  }
 
-  // 🏭 Filter by industry
-  if (industry) data = data.filter((c) => c.industry === industry);
+  // 🏭 FILTER BY INDUSTRY (FIXED: trim + lowercase)
+  if (industry) {
+    const ind = industry.trim().toLowerCase();
+    data = data.filter(
+      (c) => c.industry.trim().toLowerCase() === ind
+    );
+  }
 
-  // 🔽 Sorting
+  // 🔽 SORTING
   if (sortBy) {
     data.sort((a, b) => {
       const A = String(a[sortBy]).toLowerCase();
@@ -77,7 +87,7 @@ export async function getCompanies({
     });
   }
 
-  // 📄 Pagination
+  // 📄 PAGINATION
   const total = data.length;
   const start = (page - 1) * limit;
   const paginated = data.slice(start, start + limit);
