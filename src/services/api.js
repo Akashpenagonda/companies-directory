@@ -1,4 +1,3 @@
-// src/services/api.js
 import axios from "axios";
 
 const IS_LOCAL =
@@ -8,67 +7,68 @@ const IS_LOCAL =
 // Local json-server
 const LOCAL_BASE = "http://localhost:4000";
 
-// Production: serve from /companies.json (Netlify)
-const PROD_BASE = "";
+// Production (Netlify): load static JSON file
+const PROD_JSON = "/companies.json";
 
-// Build json-server params
-function buildJsonServerParams({ page, limit, q, location, industry, sortBy, order }) {
-  const params = {};
-
-  if (page) params._page = page;
-  if (limit) params._limit = limit;
-  if (sortBy) {
-    params._sort = sortBy;
-    params._order = order || "asc";
-  }
-  if (q) params.q = q;
-  if (location) params.location = location;
-  if (industry) params.industry = industry;
-
-  return params;
-}
-
-export async function getCompanies(opts = {}) {
-  const { page = 1, limit = 6, q, location, industry, sortBy, order } = opts;
-
+export async function getCompanies({
+  page = 1,
+  limit = 6,
+  q,
+  location,
+  industry,
+  sortBy,
+  order
+} = {}) {
   // ---------------------------------------------------------
-  // 🔹 1) LOCAL MODE → Use json-server (localhost:4000)
+  // ✔ LOCAL MODE → Use json-server
   // ---------------------------------------------------------
   if (IS_LOCAL) {
-    const url = `${LOCAL_BASE}/companies`;
-    const params = buildJsonServerParams({ page, limit, q, location, industry, sortBy, order });
+    const params = {
+      _page: page,
+      _limit: limit
+    };
 
-    const res = await axios.get(url, { params });
+    if (q) params.q = q;
+    if (location) params.location = location;
+    if (industry) params.industry = industry;
+    if (sortBy) {
+      params._sort = sortBy;
+      params._order = order || "asc";
+    }
 
-    const totalHeader = res.headers["x-total-count"];
-    const total = totalHeader ? parseInt(totalHeader) : res.data.length;
+    const res = await axios.get(`${LOCAL_BASE}/companies`, { params });
+
+    const total = parseInt(res.headers["x-total-count"] || res.data.length);
 
     return { data: res.data, total };
   }
 
   // ---------------------------------------------------------
-  // 🔹 2) PRODUCTION (NETLIFY) → Load from /companies.json
+  // ✔ PRODUCTION (Netlify) → Use /companies.json
   // ---------------------------------------------------------
-  const res = await axios.get(`${PROD_BASE}/companies.json`);
+  const res = await axios.get(PROD_JSON);
 
-  let data = Array.isArray(res.data.companies) ? [...res.data.companies] : [];
+  // IMPORTANT: res.data IS ALREADY AN ARRAY
+  let data = Array.isArray(res.data) ? [...res.data] : [];
 
-  // Search
+  // 🔍 Search
   if (q) {
-    const txt = q.toLowerCase();
+    const text = q.toLowerCase();
     data = data.filter(
       (c) =>
-        c.name.toLowerCase().includes(txt) ||
-        c.location.toLowerCase().includes(txt) ||
-        c.industry.toLowerCase().includes(txt)
+        c.name.toLowerCase().includes(text) ||
+        c.location.toLowerCase().includes(text) ||
+        c.industry.toLowerCase().includes(text)
     );
   }
 
-  // Filters
+  // 📍 Filter by location
   if (location) data = data.filter((c) => c.location === location);
+
+  // 🏭 Filter by industry
   if (industry) data = data.filter((c) => c.industry === industry);
 
-  // Sorting
+  // 🔽 Sorting
   if (sortBy) {
     data.sort((a, b) => {
       const A = String(a[sortBy]).toLowerCase();
@@ -77,7 +77,7 @@ export async function getCompanies(opts = {}) {
     });
   }
 
-  // Pagination
+  // 📄 Pagination
   const total = data.length;
   const start = (page - 1) * limit;
   const paginated = data.slice(start, start + limit);
